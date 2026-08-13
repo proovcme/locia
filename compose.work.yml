@@ -53,7 +53,7 @@ services:
     volumes:
       - locia-storage:/app/storage
     healthcheck:
-      test: ["CMD", "php", "-r", "require '/app/app/bootstrap.php'; App\\Core\\Database::pdo()->query('SELECT 1');"]
+      test: ["CMD-SHELL", "test -f /tmp/locia-ready && nc -z 127.0.0.1 9000"]
       interval: 10s
       timeout: 5s
       retries: 12

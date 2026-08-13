@@ -14,4 +14,5 @@ done
 php /app/scripts/migrate.php
 php /app/scripts/work_setup.php
 
+touch /tmp/locia-ready
 exec php-fpm -F

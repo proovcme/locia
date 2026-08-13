@@ -1,4 +1,4 @@
-{$LOCIA_WORK_SITE:http://localhost} {
+{$LOCIA_WORK_SITE:http://} {
 	encode zstd gzip
 
 	header {

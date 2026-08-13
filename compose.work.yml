@@ -66,7 +66,7 @@ services:
       lemma:
         condition: service_healthy
     environment:
-      LOCIA_WORK_SITE: "${LOCIA_WORK_SITE:-http://localhost}"
+      LOCIA_WORK_SITE: "${LOCIA_WORK_SITE:-http://}"
     ports:
       - "${LOCIA_WORK_HTTP_PORT:-8080}:80"
       - "${LOCIA_WORK_HTTPS_PORT:-8443}:443"

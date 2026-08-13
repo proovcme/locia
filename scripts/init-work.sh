@@ -21,7 +21,7 @@ data_key=$(openssl rand -base64 32 | tr -d '\n')
 umask 077
 {
   echo 'APP_URL=http://localhost:8080'
-  echo 'LOCIA_WORK_SITE=http://localhost'
+  echo 'LOCIA_WORK_SITE=http://'
   echo 'LOCIA_WORK_HTTP_PORT=8080'
   echo 'LOCIA_WORK_HTTPS_PORT=8443'
   echo

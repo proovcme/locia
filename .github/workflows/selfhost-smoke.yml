@@ -53,7 +53,7 @@ jobs:
       - name: Validate work Compose
         run: docker compose --env-file .env.work -f compose.work.yml config --quiet
       - name: Start work contour
-        run: docker compose --env-file .env.work -f compose.work.yml up --build -d
+        run: docker compose --env-file .env.work -f compose.work.yml up --build -d --wait --wait-timeout 180
       - name: Probe login, persistence and backup
         run: |
           ready=0

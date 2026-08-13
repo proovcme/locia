@@ -77,6 +77,12 @@ services:
       - ./public/pircalc:/srv/calculator:ro
       - caddy-data:/data
       - caddy-config:/config
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1/login | grep -q 'Табельный номер или email'"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
     restart: unless-stopped
 
 volumes:

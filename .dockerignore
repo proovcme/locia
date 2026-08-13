@@ -1,0 +1,8 @@
+.git
+.github
+assets
+docs
+README.md
+*.log
+.env
+

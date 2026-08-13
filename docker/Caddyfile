@@ -1,0 +1,60 @@
+:8080 {
+	encode zstd gzip
+
+	header {
+		-Server
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	@private path /.env /.git/* /composer.json /storage/* /app/* /config/* /scripts/* /database/*
+	handle @private {
+		respond 404
+	}
+
+	redir /lemma /lemma/ 308
+	redir /lemma/calculator /pircalc/ 302
+	redir /lemma/calculator/* /pircalc/ 302
+	handle_path /lemma/* {
+		header Cache-Control "no-store"
+		header X-Frame-Options "SAMEORIGIN"
+		reverse_proxy lemma:8080
+	}
+
+	redir /atlas /atlas/ 308
+	handle_path /atlas/* {
+		header X-Frame-Options "DENY"
+		root * /srv/atlas
+		@atlas_index path /
+		rewrite @atlas_index /index.html
+		@atlas_file file
+		file_server @atlas_file
+		respond 404
+	}
+
+	redir /pircalc /pircalc/ 308
+	handle_path /pircalc/* {
+		header X-Frame-Options "DENY"
+		root * /srv/pircalc
+		try_files {path} /index.html
+		file_server
+	}
+
+	@seo path /robots.txt /sitemap.xml
+	handle @seo {
+		root * /srv/site
+		file_server
+	}
+
+	handle / {
+		root * /srv/site
+		rewrite * /index.html
+		file_server
+	}
+
+	handle {
+		respond 404
+	}
+}
+

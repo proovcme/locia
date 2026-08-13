@@ -1,0 +1,168 @@
+{
+  "repository": "https://github.com/buildingSMART/Sample-Test-Files",
+  "commit": "cecf656112a54a0d8cdd8b06b9398bfea5163886",
+  "license": "CC BY 4.0",
+  "models": [
+    {
+      "id": "ifc4-reference-basin",
+      "label": "Чаша, тесселяция · IFC4",
+      "group": "IFC4 · эталонные примеры",
+      "url": "models/buildingsmart/ifc4/reference/basin-tessellation.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-reference-column",
+      "label": "Прямоугольная колонна · IFC4",
+      "group": "IFC4 · эталонные примеры",
+      "url": "models/buildingsmart/ifc4/reference/column-straight-rectangle-tessellation.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-reference-item",
+      "label": "Тесселированный элемент · IFC4",
+      "group": "IFC4 · эталонные примеры",
+      "url": "models/buildingsmart/ifc4/reference/tessellated-item.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-reference-colors",
+      "label": "Тесселяция с цветами · IFC4",
+      "group": "IFC4 · эталонные примеры",
+      "url": "models/buildingsmart/ifc4/reference/tessellation-with-individual-colors.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-reference-wall",
+      "label": "Стена с проёмом и окном · IFC4",
+      "group": "IFC4 · эталонные примеры",
+      "url": "models/buildingsmart/ifc4/reference/wall-with-opening-and-window.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-building-architecture",
+      "label": "Архитектура · IFC4",
+      "group": "IFC4 · здание",
+      "url": "models/buildingsmart/ifc4/pcert/Building-Architecture.ifc",
+      "default": true
+    },
+    {
+      "id": "ifc4-building-hvac",
+      "label": "Отопление и вентиляция · IFC4",
+      "group": "IFC4 · здание",
+      "url": "models/buildingsmart/ifc4/pcert/Building-Hvac.ifc",
+      "default": true
+    },
+    {
+      "id": "ifc4-building-landscaping",
+      "label": "Благоустройство · IFC4",
+      "group": "IFC4 · здание",
+      "url": "models/buildingsmart/ifc4/pcert/Building-Landscaping.ifc",
+      "default": true
+    },
+    {
+      "id": "ifc4-building-structural",
+      "label": "Конструкции · IFC4",
+      "group": "IFC4 · здание",
+      "url": "models/buildingsmart/ifc4/pcert/Building-Structural.ifc",
+      "default": true
+    },
+    {
+      "id": "ifc4-infra-bridge",
+      "label": "Мост · IFC4",
+      "group": "IFC4 · инфраструктура",
+      "url": "models/buildingsmart/ifc4/pcert/Infra-Bridge.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-infra-landscaping",
+      "label": "Ландшафт · IFC4",
+      "group": "IFC4 · инфраструктура",
+      "url": "models/buildingsmart/ifc4/pcert/Infra-Landscaping.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-infra-plumbing",
+      "label": "Инженерные сети · IFC4",
+      "group": "IFC4 · инфраструктура",
+      "url": "models/buildingsmart/ifc4/pcert/Infra-Plumbing.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-infra-rail",
+      "label": "Железная дорога · IFC4",
+      "group": "IFC4 · инфраструктура",
+      "url": "models/buildingsmart/ifc4/pcert/Infra-Rail.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4-infra-road",
+      "label": "Автомобильная дорога · IFC4",
+      "group": "IFC4 · инфраструктура",
+      "url": "models/buildingsmart/ifc4/pcert/Infra-Road.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-building-architecture",
+      "label": "Архитектура · IFC4.3",
+      "group": "IFC4.3 · здание",
+      "url": "models/buildingsmart/ifc4x3/pcert/Building-Architecture.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-building-hvac",
+      "label": "Отопление и вентиляция · IFC4.3",
+      "group": "IFC4.3 · здание",
+      "url": "models/buildingsmart/ifc4x3/pcert/Building-Hvac.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-building-landscaping",
+      "label": "Благоустройство · IFC4.3",
+      "group": "IFC4.3 · здание",
+      "url": "models/buildingsmart/ifc4x3/pcert/Building-Landscaping.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-building-structural",
+      "label": "Конструкции · IFC4.3",
+      "group": "IFC4.3 · здание",
+      "url": "models/buildingsmart/ifc4x3/pcert/Building-Structural.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-infra-bridge",
+      "label": "Мост · IFC4.3",
+      "group": "IFC4.3 · инфраструктура",
+      "url": "models/buildingsmart/ifc4x3/pcert/Infra-Bridge.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-infra-landscaping",
+      "label": "Ландшафт · IFC4.3",
+      "group": "IFC4.3 · инфраструктура",
+      "url": "models/buildingsmart/ifc4x3/pcert/Infra-Landscaping.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-infra-plumbing",
+      "label": "Инженерные сети · IFC4.3",
+      "group": "IFC4.3 · инфраструктура",
+      "url": "models/buildingsmart/ifc4x3/pcert/Infra-Plumbing.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-infra-rail",
+      "label": "Железная дорога · IFC4.3",
+      "group": "IFC4.3 · инфраструктура",
+      "url": "models/buildingsmart/ifc4x3/pcert/Infra-Rail.ifc",
+      "default": false
+    },
+    {
+      "id": "ifc4x3-infra-road",
+      "label": "Автомобильная дорога · IFC4.3",
+      "group": "IFC4.3 · инфраструктура",
+      "url": "models/buildingsmart/ifc4x3/pcert/Infra-Road.ifc",
+      "default": false
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+*.ifc binary linguist-detectable=false
+*.png binary
+*.wasm binary linguist-vendored=true
+
+public/atlas/assets/** linguist-generated=true
+public/atlas/fragments/** linguist-generated=true
+public/pircalc/assets/** linguist-generated=true

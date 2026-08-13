@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /lemma/
+Disallow: /atlas/models/
+Disallow: /api/
+
+Sitemap: https://locia.work/sitemap.xml

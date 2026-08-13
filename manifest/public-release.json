@@ -1,0 +1,26 @@
+{
+  "schema": "locia.public-release.v1",
+  "generated_at": "2026-08-13T18:00:00+03:00",
+  "site": "https://locia.work/",
+  "products": {
+    "lemma": {
+      "type": "synthetic-demo-runtime",
+      "source_commit": "6095d70"
+    },
+    "atlas": {
+      "type": "static-public-build",
+      "source_commit": "6095d70",
+      "ifc_models": 23
+    },
+    "calculator": {
+      "type": "static-public-build",
+      "source_commit": "0ad2b19"
+    }
+  },
+  "third_party": {
+    "buildingSMART/Sample-Test-Files": {
+      "commit": "cecf656112a54a0d8cdd8b06b9398bfea5163886",
+      "license": "CC-BY-4.0"
+    }
+  }
+}

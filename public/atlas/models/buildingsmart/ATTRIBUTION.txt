@@ -1,0 +1,8 @@
+buildingSMART Sample & Test Files
+Source: https://github.com/buildingSMART/Sample-Test-Files
+Pinned source commit: cecf656112a54a0d8cdd8b06b9398bfea5163886
+License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+License text: https://creativecommons.org/licenses/by/4.0/legalcode.txt
+
+Public-demo modification: IFC person identifiers, names and header author fields were cleared.
+Geometry, object data, discipline structure and buildingSMART attribution were preserved.

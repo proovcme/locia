@@ -1,0 +1,45 @@
+name: self-host smoke
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit public tree
+        run: ./scripts/audit-public.sh
+      - name: Validate Compose
+        run: docker compose config --quiet
+      - name: Start public contour
+        run: docker compose up --build -d
+      - name: Probe pages and privacy boundary
+        run: |
+          ready=0
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/lemma/login >/dev/null; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          test "$ready" -eq 1
+          curl -fsS http://127.0.0.1:8080/ | grep -Fq 'Лемма'
+          curl -fsS http://127.0.0.1:8080/atlas/ | grep -Fq 'Атлас'
+          curl -fsS http://127.0.0.1:8080/pircalc/ | grep -Fq 'Формы 2П, 3П и 4П'
+          curl -fsS http://127.0.0.1:8080/atlas/models/buildingsmart/catalog.json | grep -Fq 'ifc4x3-infra-road'
+          test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/.env)" = 404
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+      - name: Stop contour
+        if: always()
+        run: docker compose down -v
+

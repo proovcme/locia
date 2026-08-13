@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Audit public tree
         run: ./scripts/audit-public.sh
       - name: Validate Compose
@@ -42,4 +42,3 @@ jobs:
       - name: Stop contour
         if: always()
         run: docker compose down -v
-

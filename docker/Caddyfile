@@ -1,4 +1,4 @@
-:8080 {
+{$PUBLIC_BIND::8080} {
 	encode zstd gzip
 
 	header {
@@ -19,36 +19,34 @@
 	handle_path /lemma/* {
 		header Cache-Control "no-store"
 		header X-Frame-Options "SAMEORIGIN"
-		reverse_proxy lemma:8080
+		reverse_proxy {$LEMMA_UPSTREAM:lemma:8080}
 	}
 
 	redir /atlas /atlas/ 308
 	handle_path /atlas/* {
 		header X-Frame-Options "DENY"
-		root * /srv/atlas
+		root * {$ATLAS_ROOT:/srv/atlas}
 		@atlas_index path /
 		rewrite @atlas_index /index.html
-		@atlas_file file
-		file_server @atlas_file
-		respond 404
+		file_server
 	}
 
 	redir /pircalc /pircalc/ 308
 	handle_path /pircalc/* {
 		header X-Frame-Options "DENY"
-		root * /srv/pircalc
+		root * {$PIRCALC_ROOT:/srv/pircalc}
 		try_files {path} /index.html
 		file_server
 	}
 
 	@seo path /robots.txt /sitemap.xml
 	handle @seo {
-		root * /srv/site
+		root * {$SITE_ROOT:/srv/site}
 		file_server
 	}
 
 	handle / {
-		root * /srv/site
+		root * {$SITE_ROOT:/srv/site}
 		rewrite * /index.html
 		file_server
 	}
@@ -57,4 +55,3 @@
 		respond 404
 	}
 }
-

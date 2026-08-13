@@ -1,10 +1,10 @@
-# Locia Public
+# Locia
 
 [![self-host smoke](https://github.com/proovcme/locia/actions/workflows/selfhost-smoke.yml/badge.svg)](https://github.com/proovcme/locia/actions/workflows/selfhost-smoke.yml)
 [![live](https://img.shields.io/badge/live-locia.work-9B1C31)](https://locia.work/)
 [![self-hosted](https://img.shields.io/badge/self--hosted-Docker-2496ED?logo=docker&logoColor=white)](docs/SELF_HOSTING.md)
 
-Публичный демонстрационный контур для проектных организаций: управление проектами, просмотр IFC-моделей и расчёт стоимости проектных работ.
+Набор инструментов для проектной организации: управление проектами, просмотр IFC-моделей и расчёт стоимости проектных работ.
 
 [Открыть locia.work](https://locia.work/) · [Лемма](https://locia.work/lemma/) · [Атлас](https://locia.work/atlas/) · [Калькулятор](https://locia.work/pircalc/)
 
@@ -12,33 +12,27 @@
 
 ## Три продукта
 
-| Продукт | Назначение | Live |
+| Продукт | Назначение | Демо |
 |---|---|---|
-| **Лемма** | Управление проектами, задачами, сроками, загрузкой и контролем проектирования | [Открыть демо](https://locia.work/lemma/) |
-| **Атлас** | Просмотр информационных моделей IFC в браузере: федерации, структура, слои, сечения и измерения | [Открыть viewer](https://locia.work/atlas/) |
-| **Калькулятор** | Сметы на проектные работы: норматив ФГИС ЦС и формы 2П, 3П, 4П | [Открыть расчёт](https://locia.work/pircalc/) |
+| **Лемма** | Управление проектами, задачами, сроками, загрузкой и контролем проектирования | [Открыть](https://locia.work/lemma/) |
+| **Атлас** | IFC viewer: федерации, структура, слои, сечения и измерения | [Открыть](https://locia.work/atlas/) |
+| **Калькулятор** | Сметы на проектные работы по ФГИС ЦС, формы 2П, 3П и 4П | [Открыть](https://locia.work/pircalc/) |
 
 ### Лемма
-
-Демо открывается без пароля по одной из четырёх ролей. База создаётся заново при каждом старте и содержит только синтетические проекты, сотрудников, задачи и показатели.
 
 ![Лемма — управление проектами в проектировании](assets/lemma.png)
 
 ### Атлас
 
-WebGL-просмотрщик работает без установки ПО. В публичный каталог включены все 23 IFC-файла из официального репозитория [buildingSMART Sample & Test Files](https://github.com/buildingSMART/Sample-Test-Files): IFC4, IFC4.3, здания, инфраструктура и эталонные примеры. Стартовая сцена объединяет четыре дисциплины здания.
+В каталоге — 23 открытые IFC-модели из [buildingSMART Sample & Test Files](https://github.com/buildingSMART/Sample-Test-Files).
 
-![Атлас — публичный просмотр IFC](assets/atlas.png)
+![Атлас — просмотр IFC и BIM-моделей](assets/atlas.png)
 
 ### Калькулятор
 
-Браузерный расчёт стоимости проектных работ по нормативу ФГИС ЦС, трудозатратам и командировочным расходам с подготовкой форм 2П, 3П и 4П.
+![Калькулятор стоимости проектных работ](assets/calculator.png)
 
-![Калькулятор проектных работ](assets/calculator.png)
-
-## Self-host за одну команду
-
-Нужны Docker Engine и Docker Compose v2.
+## Запустить демо
 
 ```bash
 git clone https://github.com/proovcme/locia.git
@@ -46,44 +40,35 @@ cd locia
 docker compose up --build -d
 ```
 
-Откройте [http://localhost:8080](http://localhost:8080). Порт и публичный origin можно изменить через `.env`:
+Откройте [http://localhost:8080](http://localhost:8080). Демо использует синтетические данные и пересоздаётся при старте.
+
+## Развернуть для работы
+
+Рабочий контур использует постоянную MariaDB, обычный вход по паролю и автоматические миграции.
 
 ```bash
-cp .env.example .env
-docker compose up --build -d
+./scripts/init-work.sh admin@company.ru
+docker compose --env-file .env.work -f compose.work.yml up --build -d
+./scripts/backup-work.sh
 ```
 
-Подробности: [self-hosting](docs/SELF_HOSTING.md), [архитектура](docs/ARCHITECTURE.md), [публичная граница](docs/PUBLIC_BOUNDARY.md).
+После первой команды сохраните показанный пароль администратора. Локальный адрес — [http://localhost:8080](http://localhost:8080). Для сервера с доменом и HTTPS, обновлений и восстановления из резервной копии используйте [инструкцию по self-hosting](docs/SELF_HOSTING.md).
 
-## Что лежит в репозитории
+Рабочая установка автономна: она не подключается к служебным контурам `locia.work`, а интеграции обновлений, уведомлений и Revit по умолчанию выключены.
+
+## Состав репозитория
 
 ```text
-apps/lemma/       изолированный PHP/SQLite demo-runtime
-public/atlas/     проверенная статическая сборка Атласа и 23 IFC
-public/pircalc/   проверенная статическая сборка калькулятора
-site/             главная, robots.txt и sitemap.xml
-docker/           контейнер Леммы и Caddy-маршрутизация
-assets/           скриншоты реального публичного контура
-manifest/         происхождение сборок и закреплённые версии источников
+apps/lemma/       PHP-приложение и миграции MariaDB
+public/atlas/     браузерный IFC viewer и каталог моделей
+public/pircalc/   сметный калькулятор
+site/             публичная витрина
+docker/           контейнеры и Caddy
+scripts/          аудит, настройка и резервное копирование
 ```
 
-Это отдельный showcase/self-host репозиторий. Он не содержит production-баз, конфигурации рабочих серверов, update/notify/Revit-контуров, токенов, почтовых секретов или моделей заказчиков.
-
-## Безопасность и данные
-
-- «Лемма» всегда запускается с `DEMO_MODE=1` и новой SQLite-базой.
-- Перед стартом выполняется privacy audit; при нарушении демо не поднимается.
-- Встроенные логины и адреса используют зарезервированный домен `example.local`.
-- IFC buildingSMART загружаются из закреплённого commit, сверяются по SHA-256 и очищаются от полей персон/авторов.
-- Caddy закрывает dotfiles, исходники, хранилище и любые неразрешённые IFC-пути.
-- `scripts/audit-public.sh` проверяет дерево перед публикацией.
-
-Сообщить о проблеме: [hello@locia.work](mailto:hello@locia.work). Политика: [SECURITY.md](SECURITY.md).
-
-## Индексация
-
-Главная, Атлас и Калькулятор имеют canonical URL, Open Graph, JSON-LD и входят в sitemap. Демо-страницы Леммы и каталоги моделей закрыты от поисковых роботов. GitHub-репозиторий описывает публичные продукты словами **управление проектами в проектировании**, **IFC viewer**, **BIM**, **сметный калькулятор**, **ФГИС ЦС**, **формы 2П, 3П и 4П**.
+Архитектура и границы публикации описаны в [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) и [docs/PUBLIC_BOUNDARY.md](docs/PUBLIC_BOUNDARY.md). О проблемах безопасности: [hello@locia.work](mailto:hello@locia.work).
 
 ## Лицензии
 
-Модели buildingSMART распространяются по [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); источник и изменения указаны в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Условия использования оригинальных компонентов Locia — в [LICENSE.md](LICENSE.md).
+Внутреннее использование и изменение Locia в собственной организации разрешены условиями [LICENSE.md](LICENSE.md). Модели buildingSMART распространяются по CC BY 4.0; атрибуция приведена в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

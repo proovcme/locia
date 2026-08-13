@@ -5,6 +5,8 @@ cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 
 test -f README.md
 test -f docker-compose.yml
+test -f compose.work.yml
+test -f .env.work.example
 test -f assets/landing.png
 test -f assets/lemma.png
 test -f assets/atlas.png
@@ -14,6 +16,13 @@ if find . -type f \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name '*.
   echo "Forbidden secret or data artifact found" >&2
   exit 1
 fi
+
+if git ls-files --error-unmatch .env.work >/dev/null 2>&1 || git ls-files 'backups/*' | grep -q .; then
+  echo "Working credentials or backups are tracked by Git" >&2
+  exit 1
+fi
+
+test "$(find apps/lemma/database/migrations -type f -name '*.sql' | wc -l | tr -d ' ')" -eq 97
 
 if grep -RInE --exclude-dir=.git --exclude='audit-public.sh' --exclude='*.js' --exclude='*.mjs' \
   --exclude='*.wasm' --exclude='*.png' --exclude='*.svg' --exclude='*.ifc' \

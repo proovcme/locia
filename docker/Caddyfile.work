@@ -1,0 +1,37 @@
+{$LOCIA_WORK_SITE:http://localhost} {
+	encode zstd gzip
+
+	header {
+		-Server
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		X-Frame-Options "SAMEORIGIN"
+	}
+
+	@private path /.env /.git/* /storage/* /app/* /config/* /scripts/* /database/* /docker/*
+	handle @private {
+		respond 404
+	}
+
+	redir /atlas /atlas/ 308
+	handle_path /atlas/* {
+		root * /srv/atlas
+		@atlas_index path /
+		rewrite @atlas_index /index.html
+		file_server
+	}
+
+	redir /calculator /calculator/ 308
+	handle_path /calculator/* {
+		root * /srv/calculator
+		try_files {path} /index.html
+		file_server
+	}
+
+	root * /srv/lemma/public
+	php_fastcgi lemma:9000 {
+		root /app/public
+	}
+	file_server
+}

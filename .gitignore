@@ -1,5 +1,6 @@
 .env
+.env.work
 .DS_Store
 *.log
 tmp/
-
+backups/

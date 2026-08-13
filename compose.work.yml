@@ -1,0 +1,86 @@
+services:
+  db:
+    image: mariadb:11.4
+    environment:
+      MARIADB_DATABASE: "${DB_DATABASE:-locia}"
+      MARIADB_USER: "${DB_USERNAME:-locia}"
+      MARIADB_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in .env.work}"
+      MARIADB_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in .env.work}"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - locia-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    restart: unless-stopped
+
+  lemma:
+    build:
+      context: .
+      dockerfile: docker/lemma-work.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "0"
+      APP_URL: "${APP_URL:-http://localhost:8080}"
+      APP_TIMEZONE: "${APP_TIMEZONE:-Europe/Moscow}"
+      APP_DATA_KEY: "${APP_DATA_KEY:-}"
+      DEMO_MODE: "0"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: "${DB_DATABASE:-locia}"
+      DB_USERNAME: "${DB_USERNAME:-locia}"
+      DB_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in .env.work}"
+      LOCIA_ADMIN_LOGIN: "${LOCIA_ADMIN_LOGIN:-0001}"
+      LOCIA_ADMIN_NAME: "${LOCIA_ADMIN_NAME:-Администратор}"
+      LOCIA_ADMIN_EMAIL: "${LOCIA_ADMIN_EMAIL:?Set LOCIA_ADMIN_EMAIL in .env.work}"
+      LOCIA_ADMIN_PASSWORD: "${LOCIA_ADMIN_PASSWORD:?Set LOCIA_ADMIN_PASSWORD in .env.work}"
+      ATLAS_URL: "${APP_URL:-http://localhost:8080}/atlas/"
+      MSP_SYNC_ENABLED: "0"
+      MAIL_ENABLED: "${MAIL_ENABLED:-0}"
+      MAIL_RELAY_ENABLED: "0"
+      UPDATE_CENTER_ENABLED: "0"
+      CLOUD_TRANSFER_MODE: ""
+      REVIT_INTEGRATION_ENABLED: "0"
+    volumes:
+      - locia-storage:/app/storage
+    healthcheck:
+      test: ["CMD", "php", "-r", "require '/app/app/bootstrap.php'; App\\Core\\Database::pdo()->query('SELECT 1');"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  web:
+    image: caddy:2.10-alpine
+    depends_on:
+      lemma:
+        condition: service_healthy
+    environment:
+      LOCIA_WORK_SITE: "${LOCIA_WORK_SITE:-http://localhost}"
+    ports:
+      - "${LOCIA_WORK_HTTP_PORT:-8080}:80"
+      - "${LOCIA_WORK_HTTPS_PORT:-8443}:443"
+    volumes:
+      - ./docker/Caddyfile.work:/etc/caddy/Caddyfile:ro
+      - ./apps/lemma/public:/srv/lemma/public:ro
+      - ./public/atlas:/srv/atlas:ro
+      - ./public/pircalc:/srv/calculator:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  locia-db:
+  locia-storage:
+  caddy-data:
+  caddy-config:

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This repository and <https://locia.work> are a public demonstration contour. They are independent from operational Locia installations and do not contain production data or production credentials.
+This repository and <https://locia.work> are independent from operational Locia installations and do not contain production data or production credentials. The repository also includes an opt-in self-host configuration; each operator is responsible for securing their own host, credentials, backups and network perimeter.
 
 ## Report a vulnerability
 
@@ -10,5 +10,4 @@ Send a concise report to [hello@locia.work](mailto:hello@locia.work). Include th
 
 ## Supported version
 
-Only the current `main` branch and current public deployment are supported.
-
+Only the current `main` branch, current public deployment and current self-host Compose configuration are supported.

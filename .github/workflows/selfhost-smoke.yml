@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 jobs:
-  smoke:
+  demo-smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -42,3 +42,57 @@ jobs:
       - name: Stop contour
         if: always()
         run: docker compose down -v
+
+  work-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - name: Create isolated work configuration
+        run: ./scripts/init-work.sh ci@example.local >/dev/null
+      - name: Validate work Compose
+        run: docker compose --env-file .env.work -f compose.work.yml config --quiet
+      - name: Start work contour
+        run: docker compose --env-file .env.work -f compose.work.yml up --build -d
+      - name: Probe login, persistence and backup
+        run: |
+          ready=0
+          for attempt in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:8080/login >/tmp/locia-login.html; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          test "$ready" -eq 1
+          grep -Fq 'Табельный номер или email' /tmp/locia-login.html
+          set -a
+          . ./.env.work
+          set +a
+          curl -fsS -c /tmp/locia-cookies.txt http://127.0.0.1:8080/login >/tmp/locia-login.html
+          csrf=$(sed -n 's/.*name="_csrf" value="\([^"]*\)".*/\1/p' /tmp/locia-login.html | head -n 1)
+          test -n "$csrf"
+          login_status=$(curl -sS -o /dev/null -w '%{http_code}' -b /tmp/locia-cookies.txt -c /tmp/locia-cookies.txt \
+            --data-urlencode "_csrf=$csrf" \
+            --data-urlencode "login=$LOCIA_ADMIN_LOGIN" \
+            --data-urlencode "password=$LOCIA_ADMIN_PASSWORD" \
+            http://127.0.0.1:8080/login)
+          test "$login_status" = 302
+          curl -fsS -b /tmp/locia-cookies.txt http://127.0.0.1:8080/shturman | grep -Fq 'ЛОЦИЯ'
+          test "$(docker compose --env-file .env.work -f compose.work.yml exec -T db sh -c 'mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE" -Nse "SELECT COUNT(*) FROM users"')" = 1
+          test "$(docker compose --env-file .env.work -f compose.work.yml exec -T db sh -c 'mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE" -Nse "SELECT COUNT(*) FROM projects"')" = 0
+          docker compose --env-file .env.work -f compose.work.yml restart lemma
+          for attempt in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:8080/login >/dev/null && break
+            sleep 2
+          done
+          test "$(docker compose --env-file .env.work -f compose.work.yml exec -T db sh -c 'mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE" -Nse "SELECT COUNT(*) FROM users"')" = 1
+          ./scripts/backup-work.sh /tmp/locia-backups
+          test -s /tmp/locia-backups/*/database.sql
+          test -s /tmp/locia-backups/*/storage.tar.gz
+      - name: Logs on failure
+        if: failure()
+        run: docker compose --env-file .env.work -f compose.work.yml logs
+      - name: Stop work contour
+        if: always()
+        run: docker compose --env-file .env.work -f compose.work.yml down -v

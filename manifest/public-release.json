@@ -4,8 +4,10 @@
   "site": "https://locia.work/",
   "products": {
     "lemma": {
-      "type": "synthetic-demo-runtime",
-      "source_commit": "6095d70"
+      "type": "demo-and-self-host-runtime",
+      "source_commit": "6095d7009138d13666f99c106d9acdbdb4f5d07f",
+      "work_database": "MariaDB",
+      "migrations": 97
     },
     "atlas": {
       "type": "static-public-build",

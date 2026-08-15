@@ -29,6 +29,15 @@
 		file_server
 	}
 
+	redir /pdf-editor /pdf-editor/ 308
+	request_body /pdf-editor/api/* {
+		max_size 25MB
+	}
+	handle_path /pdf-editor/* {
+		header Cache-Control "no-store"
+		reverse_proxy pdf-editor:8000
+	}
+
 	root * /srv/lemma/public
 	php_fastcgi lemma:9000 {
 		root /app/public

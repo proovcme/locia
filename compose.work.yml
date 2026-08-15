@@ -1,4 +1,27 @@
 services:
+  pdf-editor:
+    build:
+      context: .
+      dockerfile: docker/pdf-editor.Dockerfile
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=384m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 768m
+    networks:
+      - pdf-editor
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
   db:
     image: mariadb:11.4
     environment:
@@ -65,11 +88,16 @@ services:
     depends_on:
       lemma:
         condition: service_healthy
+      pdf-editor:
+        condition: service_healthy
     environment:
       LOCIA_WORK_SITE: "${LOCIA_WORK_SITE:-http://}"
     ports:
       - "${LOCIA_WORK_HTTP_PORT:-8080}:80"
       - "${LOCIA_WORK_HTTPS_PORT:-8443}:443"
+    networks:
+      - default
+      - pdf-editor
     volumes:
       - ./docker/Caddyfile.work:/etc/caddy/Caddyfile:ro
       - ./apps/lemma/public:/srv/lemma/public:ro
@@ -90,3 +118,7 @@ volumes:
   locia-storage:
   caddy-data:
   caddy-config:
+
+networks:
+  pdf-editor:
+    internal: true

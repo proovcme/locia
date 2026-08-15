@@ -11,7 +11,7 @@ permissions:
 jobs:
   demo-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
       - name: Audit public tree
@@ -34,8 +34,30 @@ jobs:
           curl -fsS http://127.0.0.1:8080/ | grep -Fq 'Лемма'
           curl -fsS http://127.0.0.1:8080/atlas/ | grep -Fq 'Атлас'
           curl -fsS http://127.0.0.1:8080/pircalc/ | grep -Fq 'Формы 2П, 3П и 4П'
+          curl -fsS http://127.0.0.1:8080/pdf-editor/ | grep -Fq 'PDF-редактор проектной документации'
+          curl -fsS http://127.0.0.1:8080/pdf-editor/api/health | grep -Fq '"status":"ok"'
           curl -fsS http://127.0.0.1:8080/atlas/models/buildingsmart/catalog.json | grep -Fq 'ifc4x3-infra-road'
           test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/.env)" = 404
+      - name: Exercise PDF engine
+        run: |
+          docker compose exec -T pdf-editor python -c 'import pymupdf; d=pymupdf.open(); p=d.new_page(); p.insert_text((72,72), "SYNTHETIC PDF"); d.save("/tmp/smoke.pdf")'
+          docker compose cp pdf-editor:/tmp/smoke.pdf /tmp/locia-pdf-smoke.pdf
+          curl -fsS \
+            -F 'payload={"args":["--inspect-json",{"input_pdf":"smoke.pdf"}]}' \
+            -F 'virtual_paths=["smoke.pdf"]' \
+            -F 'files=@/tmp/locia-pdf-smoke.pdf;type=application/pdf' \
+            http://127.0.0.1:8080/pdf-editor/api/run \
+            > /tmp/locia-pdf-response.json
+          python3 -c 'import json; d=json.load(open("/tmp/locia-pdf-response.json")); assert d["ok"] and d["page_count"] == 1 and "/tmp/" not in str(d)'
+          curl -fsS \
+            -F 'payload={"args":["--job-json",{"input_pdf":"smoke.pdf","output_pdf":"rotated.pdf","make_previews":false,"rules":[],"page_operations":[{"type":"rotate","pages":"1","angle":90}]}]}' \
+            -F 'virtual_paths=["smoke.pdf"]' \
+            -F 'files=@/tmp/locia-pdf-smoke.pdf;type=application/pdf' \
+            http://127.0.0.1:8080/pdf-editor/api/run \
+            > /tmp/locia-pdf-result.json
+          python3 -c 'import base64,json; d=json.load(open("/tmp/locia-pdf-result.json")); assert d["ok"] and d["page_operations"][0]["type"] == "rotate" and d["downloads"][0]["name"] == "rotated.pdf"; open("/tmp/rotated.pdf","wb").write(base64.b64decode(d["downloads"][0]["data"]))'
+          docker compose cp /tmp/rotated.pdf pdf-editor:/tmp/rotated.pdf
+          docker compose exec -T pdf-editor python -c 'import pymupdf; d=pymupdf.open("/tmp/rotated.pdf"); assert len(d) == 1 and d[0].rotation == 90'
       - name: Logs on failure
         if: failure()
         run: docker compose logs
@@ -45,7 +67,7 @@ jobs:
 
   work-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
       - name: Create isolated work configuration
@@ -66,6 +88,8 @@ jobs:
           done
           test "$ready" -eq 1
           grep -Fq 'Табельный номер или email' /tmp/locia-login.html
+          curl -fsS http://127.0.0.1:8080/pdf-editor/ | grep -Fq 'PDF-редактор проектной документации'
+          curl -fsS http://127.0.0.1:8080/pdf-editor/api/health | grep -Fq '"status":"ok"'
           set -a
           . ./.env.work
           set +a

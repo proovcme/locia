@@ -10,3 +10,11 @@
 
 The bundled JavaScript applications include third-party packages under their respective upstream licenses. Their package metadata and license notices remain part of the corresponding build artifacts.
 
+## PDF editor and PyMuPDF
+
+- Upstream application: <https://github.com/proovcme/pir_utilitys/pull/2>
+- Pinned commit: `9470cce726a2cdbcad1be3efaec12e16c94bff37`
+- PDF engine: [PyMuPDF](https://pymupdf.readthedocs.io/)
+- License for `apps/pdf-editor/`: GNU Affero General Public License v3.0 or later
+
+The web adapter, server boundary and included PDF engine source are available in this repository. The license of this module overrides the repository-level license only for files under `apps/pdf-editor/`.

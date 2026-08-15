@@ -11,6 +11,10 @@ test -f assets/landing.png
 test -f assets/lemma.png
 test -f assets/atlas.png
 test -f assets/calculator.png
+test -f assets/pdf-editor.png
+test -f apps/pdf-editor/COPYING
+test -f apps/pdf-editor/engine/rule_engine.py
+test -f apps/pdf-editor/server/app.py
 
 if find . -type f \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.sqlite' -o -name '*.zip' \) | grep -q .; then
   echo "Forbidden secret or data artifact found" >&2
@@ -24,7 +28,8 @@ fi
 
 test "$(find apps/lemma/database/migrations -type f -name '*.sql' | wc -l | tr -d ' ')" -eq 97
 
-if grep -RInE --exclude-dir=.git --exclude='audit-public.sh' --exclude='*.js' --exclude='*.mjs' \
+if grep -RInE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude='audit-public.sh' \
+  --exclude='COPYING' --exclude='*.mjs' \
   --exclude='*.wasm' --exclude='*.png' --exclude='*.svg' --exclude='*.ifc' \
   '(/Users/|C:\\Users\\|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|Чернетченко|Дом Радио|000_4|1835/2022)' .; then
   echo "Private marker found" >&2
@@ -39,4 +44,4 @@ fi
 model_count=$(grep -c '"id"' public/atlas/models/buildingsmart/catalog.json)
 test "$model_count" -eq 23
 
-echo "Public showcase audit passed: 23 IFC models"
+echo "Public showcase audit passed: 23 IFC models and isolated PDF editor"

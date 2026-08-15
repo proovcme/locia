@@ -39,6 +39,16 @@
 		file_server
 	}
 
+	redir /pdf-editor /pdf-editor/ 308
+	request_body /pdf-editor/api/* {
+		max_size 25MB
+	}
+	handle_path /pdf-editor/* {
+		header X-Frame-Options "DENY"
+		header Cache-Control "no-store"
+		reverse_proxy pdf-editor:8000
+	}
+
 	@seo path /robots.txt /sitemap.xml
 	handle @seo {
 		root * {$SITE_ROOT:/srv/site}

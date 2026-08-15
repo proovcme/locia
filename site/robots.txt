@@ -3,5 +3,6 @@ Allow: /
 Disallow: /lemma/
 Disallow: /atlas/models/
 Disallow: /api/
+Disallow: /pdf-editor/api/
 
 Sitemap: https://locia.work/sitemap.xml

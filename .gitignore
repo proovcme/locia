@@ -4,3 +4,7 @@
 *.log
 tmp/
 backups/
+apps/pdf-editor/node_modules/
+apps/pdf-editor/dist/
+apps/pdf-editor/engine/__pycache__/
+apps/pdf-editor/server/__pycache__/

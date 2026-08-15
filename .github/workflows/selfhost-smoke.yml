@@ -40,8 +40,7 @@ jobs:
           test "$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/.env)" = 404
       - name: Exercise PDF engine
         run: |
-          docker compose exec -T pdf-editor python -c 'import pymupdf; d=pymupdf.open(); p=d.new_page(); p.insert_text((72,72), "SYNTHETIC PDF"); d.save("/tmp/smoke.pdf")'
-          docker compose cp pdf-editor:/tmp/smoke.pdf /tmp/locia-pdf-smoke.pdf
+          docker compose exec -T pdf-editor python -c 'import pymupdf,sys; d=pymupdf.open(); p=d.new_page(); p.insert_text((72,72), "SYNTHETIC PDF"); sys.stdout.buffer.write(d.tobytes())' > /tmp/locia-pdf-smoke.pdf
           curl -fsS \
             -F 'payload={"args":["--inspect-json",{"input_pdf":"smoke.pdf"}]}' \
             -F 'virtual_paths=["smoke.pdf"]' \
@@ -56,8 +55,7 @@ jobs:
             http://127.0.0.1:8080/pdf-editor/api/run \
             > /tmp/locia-pdf-result.json
           python3 -c 'import base64,json; d=json.load(open("/tmp/locia-pdf-result.json")); assert d["ok"] and d["page_operations"][0]["type"] == "rotate" and d["downloads"][0]["name"] == "rotated.pdf"; open("/tmp/rotated.pdf","wb").write(base64.b64decode(d["downloads"][0]["data"]))'
-          docker compose cp /tmp/rotated.pdf pdf-editor:/tmp/rotated.pdf
-          docker compose exec -T pdf-editor python -c 'import pymupdf; d=pymupdf.open("/tmp/rotated.pdf"); assert len(d) == 1 and d[0].rotation == 90'
+          docker compose exec -T pdf-editor python -c 'import pymupdf,sys; d=pymupdf.open(stream=sys.stdin.buffer.read(), filetype="pdf"); assert len(d) == 1 and d[0].rotation == 90' < /tmp/rotated.pdf
       - name: Logs on failure
         if: failure()
         run: docker compose logs

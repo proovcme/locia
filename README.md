@@ -6,7 +6,7 @@
 
 **Locia — открытая витрина и self-hosted набор инструментов для проектной организации.** Он объединяет управление проектами в проектировании, работу с IFC-моделями, расчёт стоимости и корректировку PDF-документации.
 
-[Открыть locia.work](https://locia.work/) · [Лемма](https://locia.work/lemma/) · [Атлас](https://locia.work/atlas/) · [Калькулятор](https://locia.work/pircalc/) · [PDF-редактор](https://locia.work/pdf-editor/)
+[Открыть locia.work](https://locia.work/) · [Лемма](https://locia.work/lemma/) · [Атлас](https://locia.work/atlas/) · [Калькулятор](https://locia.work/pircalc/) · [PDF-редактор](https://locia.work/pdf-editor/) · [FITOUT](https://locia.work/game/)
 
 ![Главная страница locia.work](assets/landing.png)
 

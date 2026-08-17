@@ -3,17 +3,20 @@ from __future__ import annotations
 import asyncio
 import base64
 import json
+import logging
 import os
 import re
+import secrets
 import subprocess
 import sys
 import tempfile
+import time
 import zipfile
 from pathlib import Path
 from typing import Any
 
 import pymupdf
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -29,8 +32,32 @@ ALLOWED_FLAGS = {"--inspect-json", "--inspect-rule-json", "--inspect-page-json",
 ALLOWED_EXTENSIONS = {".pdf", ".png", ".jpg", ".jpeg", ".ttf", ".otf", ".ttc"}
 PDF_MAGIC = b"%PDF-"
 worker_slot = asyncio.Semaphore(1)
+logger = logging.getLogger("locia.pdf_editor")
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+
+
+@app.middleware("http")
+async def request_diagnostics(request: Request, call_next):
+    raw_request_id = request.headers.get("X-Client-Request-Id", "")
+    request_id = raw_request_id if re.fullmatch(r"[A-Za-z0-9._-]{8,80}", raw_request_id) else f"pdf-{secrets.token_hex(8)}"
+    started_at = time.monotonic()
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.exception("pdf_request_failed request_id=%s status=500 path=%s", request_id, request.url.path)
+        raise
+    response.headers["X-Request-Id"] = request_id
+    if request.url.path.endswith("/api/run"):
+        log = logger.warning if response.status_code >= 400 else logger.info
+        log(
+            "pdf_request_finished request_id=%s status=%d bytes=%s duration_ms=%d",
+            request_id,
+            response.status_code,
+            request.headers.get("content-length", "unknown"),
+            round((time.monotonic() - started_at) * 1000),
+        )
+    return response
 
 
 def clean_name(value: str, fallback: str) -> str:

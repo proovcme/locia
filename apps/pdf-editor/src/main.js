@@ -1,4 +1,5 @@
 import { open, save, invoke } from "./web-runtime.js";
+import { DESKTOP_DOWNLOAD_URL, buildDiagnosticReport, displayFileName } from "./diagnostics.js";
 import profile from "../profiles/spds_stamp_mvp.json";
 import "./styles.css";
 
@@ -213,6 +214,13 @@ function renderFiles() {
           <span class="picker-label">${state.inputs.length > 1 ? "Папка результатов" : "Выходной PDF"}</span>
           <strong>${outputLabel}</strong>
         </button>
+      </div>
+      <div class="upload-limit-notice">
+        <div>
+          <strong>Ограничение web-версии: 24 МБ</strong>
+          <span>Суммарно за одну обработку, не более 20 PDF. Для больших файлов и целых папок используйте настольное приложение.</span>
+        </div>
+        <a href="${DESKTOP_DOWNLOAD_URL}" download>Скачать настольную версию для Windows</a>
       </div>
     </section>`;
 }
@@ -483,11 +491,12 @@ function renderFooter() {
   const progress = state.progress;
   const percent = progress ? Math.round((progress.completed + progress.failed) / Math.max(1, progress.total) * 100) : 0;
   return `
-    <section class="action-bar ${state.messageType}">
+    <section class="action-bar ${state.messageType}" aria-live="polite">
       <div class="status-info">
-        <strong>${state.running ? `Обработка комплекта: ${percent}%` : state.messageType === "success" ? "Готово" : state.messageType === "error" ? "Ошибка" : "Информация"}</strong>
+        <strong>${state.running ? `Обработка комплекта: ${percent}%` : state.messageType === "success" ? "Готово" : state.messageType === "error" ? "Завершено с ошибкой" : state.messageType === "warning" ? "Предупреждение" : "Информация"}</strong>
         <p>${state.message}</p>
         ${progress ? `<div class="progress-track"><i style="width:${percent}%"></i></div><small class="progress-caption">Готово: ${progress.completed} · Ошибок: ${progress.failed} · Всего: ${progress.total}</small>` : ""}
+        ${renderRunLog(progress)}
       </div>
       <div class="footer-actions">
         <label class="plain-check"><input id="previews" type="checkbox" ${state.makePreviews ? "checked" : ""}> Создать PNG-превью</label>
@@ -495,6 +504,28 @@ function renderFooter() {
         <button id="run" class="primary" ${state.running ? "disabled" : ""}>${state.running ? "Обработка…" : "Выполнить и скачать"}</button>
       </div>
     </section>`;
+}
+
+function renderRunLog(progress) {
+  if (!progress?.results?.length) return "";
+  const hasErrors = progress.failed > 0;
+  return `<details class="run-log" ${hasErrors ? "open" : ""}>
+    <summary>Журнал обработки · ${progress.completed} успешно · ${progress.failed} с ошибкой</summary>
+    <div class="run-log-list">
+      ${progress.results.map((item) => `<article class="run-log-item ${item.ok ? "success" : "error"}">
+        <div class="run-log-head">
+          <strong>${item.ok ? "Готово" : "Ошибка"}: ${esc(displayFileName(item.input))}</strong>
+          <span>${Number.isFinite(item.durationMs) ? `${(item.durationMs / 1000).toFixed(1)} с` : ""}</span>
+        </div>
+        ${item.ok
+          ? `<p>${Number(item.operationCount || 0)} изменений · результат скачан</p>`
+          : `<p class="run-log-message">${esc(item.error || "Неизвестная ошибка")}</p>
+             ${item.hint ? `<p class="run-log-hint"><strong>Что делать:</strong> ${esc(item.hint)}</p>` : ""}`}
+        <small>${item.stage ? `Этап: ${esc(item.stage)} · ` : ""}${item.code ? `Код: ${esc(item.code)} · ` : ""}ID: <code>${esc(item.requestId || "нет")}</code></small>
+      </article>`).join("")}
+      <button id="copy-run-log" class="secondary-btn copy-log-btn" type="button">Копировать журнал</button>
+    </div>
+  </details>`;
 }
 
 function renderPreviewModal() {
@@ -603,6 +634,7 @@ function bindEvents() {
   document.querySelector("#pick-rule-image")?.addEventListener("click", () => chooseImage(selectedRule()));
   document.querySelector("#previews")?.addEventListener("change", (event) => state.makePreviews = event.target.checked);
   document.querySelector("#run")?.addEventListener("click", runEngine);
+  document.querySelector("#copy-run-log")?.addEventListener("click", copyRunLog);
   document.querySelector("#inspect-rule")?.addEventListener("click", inspectSelectedRule);
   document.querySelector("#import-profile")?.addEventListener("click", importProfile);
   document.querySelector("#export-profile")?.addEventListener("click", exportProfile);
@@ -629,6 +661,20 @@ function bindEvents() {
   document.querySelector("#direct-next")?.addEventListener("click", () => changeDirectPage(state.directPage + 1));
   document.querySelector("#direct-page-number")?.addEventListener("change", (event) => changeDirectPage(Number(event.target.value)));
   document.querySelector("#add-direct-rule")?.addEventListener("click", addDirectRule);
+}
+
+async function copyRunLog() {
+  if (!state.progress) return;
+  const report = buildDiagnosticReport(state.progress);
+  try {
+    await navigator.clipboard.writeText(report);
+    state.message = "Журнал обработки скопирован в буфер обмена.";
+    state.messageType = state.progress.failed ? "error" : "success";
+  } catch {
+    state.message = "Не удалось скопировать журнал автоматически. Раскройте журнал и скопируйте данные вручную.";
+    state.messageType = "error";
+  }
+  render();
 }
 
 function updateBinding(element) {
@@ -1007,6 +1053,7 @@ async function runEngine() {
   }
   state.running = true;
   state.progress = { total: state.inputs.length, completed: 0, failed: 0, results: [] };
+  state.previewPages = [];
   state.messageType = "info";
   render();
 
@@ -1015,6 +1062,7 @@ async function runEngine() {
     const outputPdf = state.inputs.length === 1 ? state.output : joinPath(state.outputDir, `${baseName(inputPdf)}_изменён.pdf`);
     state.message = `Обработка ${index + 1} из ${state.inputs.length}: ${shortPath(inputPdf)}`;
     render();
+    const startedAt = performance.now();
     try {
       const job = { input_pdf: inputPdf, output_pdf: outputPdf, make_previews: state.makePreviews, rules: state.rules, page_operations: state.pageOperations };
       const output = await invoke("run_engine", { args: ["--job-json", JSON.stringify(job)] });
@@ -1023,18 +1071,35 @@ async function runEngine() {
       state.previewPages = Array.isArray(result.preview_pages) ? result.preview_pages : [];
       state.selectedPreviewPage = state.previewPages[0]?.page || 1;
       state.progress.completed++;
-      state.progress.results.push({ input: inputPdf, ok: true, result });
+      state.progress.results.push({
+        input: inputPdf,
+        ok: true,
+        operationCount: result.operation_count,
+        requestId: result.request_id,
+        durationMs: performance.now() - startedAt,
+      });
     } catch (error) {
       state.progress.failed++;
-      state.progress.results.push({ input: inputPdf, ok: false, error: String(error.message || error) });
+      state.progress.results.push({
+        input: inputPdf,
+        ok: false,
+        error: String(error.message || error),
+        hint: error.hint || "Проверьте параметры операции и повторите попытку.",
+        code: error.code || "UNEXPECTED_ERROR",
+        stage: error.stage || "PDF-движок",
+        status: error.status || null,
+        requestId: error.requestId || "нет",
+        durationMs: performance.now() - startedAt,
+      });
     }
     render();
   }
   state.running = false;
-  state.message = state.progress.failed
-    ? `Пакет завершён. Успешно: ${state.progress.completed}; с ошибками: ${state.progress.failed}.`
+  const firstError = state.progress.results.find((item) => !item.ok);
+  state.message = firstError
+    ? `${displayFileName(firstError.input)}: ${firstError.error} ${firstError.hint}`
     : `Готово! Обработано и скачано файлов: ${state.progress.completed}.`;
-  state.messageType = state.progress.failed ? "warning" : "success";
+  state.messageType = state.progress.failed ? "error" : "success";
   render();
 }
 

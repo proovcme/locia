@@ -1,3 +1,5 @@
+import { describeHttpFailure, toDiagnosticError, validateUploadFiles } from "./diagnostics.js";
+
 const filesByPath = new Map();
 const folders = new Map();
 
@@ -104,25 +106,44 @@ async function runEngine(args) {
   const flag = args?.[0];
   const request = JSON.parse(args?.[1] || "{}");
   const paths = [...collectFilePaths(request)];
+  const requestId = `pdf-${crypto.randomUUID()}`;
+  const selectedFiles = paths.map((path) => filesByPath.get(path)).filter(Boolean);
+  const validation = validateUploadFiles(selectedFiles);
+  if (!validation.ok) throw toDiagnosticError({ ...validation, requestId });
   const form = new FormData();
   form.append("payload", JSON.stringify({ args: [flag, request] }));
   form.append("virtual_paths", JSON.stringify(paths));
   for (const path of paths) form.append("files", filesByPath.get(path), safeName(filesByPath.get(path).name));
 
-  const response = await fetch(new URL("api/run", document.baseURI), {
-    method: "POST",
-    body: form,
-    credentials: "same-origin",
-    headers: { Accept: "application/json" },
-  });
+  let response;
+  try {
+    response = await fetch(new URL("api/run", document.baseURI), {
+      method: "POST",
+      body: form,
+      credentials: "same-origin",
+      headers: { Accept: "application/json", "X-Client-Request-Id": requestId },
+    });
+  } catch (error) {
+    throw toDiagnosticError({
+      code: "NETWORK_ERROR",
+      stage: "Соединение с сервером",
+      message: "Не удалось передать PDF на сервер.",
+      hint: "Проверьте подключение к интернету и повторите попытку.",
+      requestId,
+      cause: String(error?.message || error),
+    });
+  }
   const result = await response.json().catch(() => ({ ok: false, error: `HTTP ${response.status}` }));
-  if (!response.ok || !result.ok) throw new Error(result.error || `HTTP ${response.status}`);
+  if (!response.ok || !result.ok) {
+    throw toDiagnosticError(describeHttpFailure(response.status, result, requestId));
+  }
 
   for (const artifact of result.downloads || []) {
     downloadBlob(new Blob([decodeBase64(artifact.data)], { type: artifact.mime || "application/octet-stream" }), artifact.name);
   }
   const cleanResult = { ...result };
   delete cleanResult.downloads;
+  cleanResult.request_id = response.headers.get("X-Request-Id") || requestId;
   return { code: 0, stdout: JSON.stringify(cleanResult), stderr: "" };
 }
 

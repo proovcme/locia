@@ -1,0 +1,73 @@
+name: PDF editor desktop release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      APP_DIR: pir-utilitys/apps/pdf-batch-editor
+      RELEASE_TAG: pdf-editor-v0.0.1
+      RELEASE_ASSET: Locia-PDF-Editor-0.0.1-Windows-x64.exe
+    steps:
+      - name: Checkout pinned desktop source
+        uses: actions/checkout@v4
+        with:
+          repository: proovcme/pir_utilitys
+          ref: 9470cce726a2cdbcad1be3efaec12e16c94bff37
+          path: pir-utilitys
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        shell: pwsh
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+          python -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Build Windows installer
+        shell: pwsh
+        working-directory: ${{ env.APP_DIR }}
+        run: pnpm build:desktop
+
+      - name: Prepare release files
+        shell: pwsh
+        working-directory: ${{ env.APP_DIR }}
+        run: |
+          $installer = Get-ChildItem "src-tauri/target/release/bundle/nsis/*-setup.exe" | Select-Object -First 1
+          if (-not $installer) { throw "NSIS installer was not created" }
+          Copy-Item $installer.FullName $env:RELEASE_ASSET
+          $hash = (Get-FileHash $env:RELEASE_ASSET -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $env:RELEASE_ASSET" | Set-Content "$env:RELEASE_ASSET.sha256" -Encoding ascii
+
+      - name: Publish desktop release
+        shell: pwsh
+        working-directory: ${{ env.APP_DIR }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes = "Настольный PDF-редактор Locia 0.0.1 для Windows x64. Работает локально с большими PDF и папками. Установщик не подписан: Windows SmartScreen может запросить подтверждение запуска."
+          gh release view $env:RELEASE_TAG --repo "${{ github.repository }}" 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $env:RELEASE_TAG $env:RELEASE_ASSET "$env:RELEASE_ASSET.sha256" --clobber --repo "${{ github.repository }}"
+          } else {
+            gh release create $env:RELEASE_TAG $env:RELEASE_ASSET "$env:RELEASE_ASSET.sha256" --title "Locia PDF Editor 0.0.1" --notes $notes --repo "${{ github.repository }}"
+          }

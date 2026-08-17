@@ -390,6 +390,51 @@ main {
   font-size: 10px;
 }
 
+.upload-limit-notice {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-top: 12px;
+  padding: 11px 13px;
+  border: 1px solid #FBBF24;
+  border-radius: 6px;
+  background: #FFFBEB;
+  color: #78350F;
+}
+
+.upload-limit-notice > div {
+  display: grid;
+  gap: 3px;
+}
+
+.upload-limit-notice strong {
+  font-size: 12px;
+}
+
+.upload-limit-notice span {
+  color: #92400E;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.upload-limit-notice a {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border-radius: 5px;
+  background: #1D4ED8;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.upload-limit-notice a:hover {
+  background: #1E40AF;
+}
+
 .task-main-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1174,6 +1219,11 @@ legend {
   font-size: 13px;
 }
 
+.status-info {
+  min-width: 0;
+  flex: 1;
+}
+
 .status-info p {
   margin: 2px 0 0;
   max-width: 680px;
@@ -1203,6 +1253,92 @@ legend {
   margin-top: 2px;
   color: var(--text-muted);
   font-size: 10px;
+}
+
+.run-log {
+  max-width: 760px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+
+.run-log summary {
+  width: max-content;
+  max-width: 100%;
+  color: var(--text-main);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.run-log-list {
+  display: grid;
+  gap: 6px;
+  max-height: 240px;
+  margin-top: 8px;
+  padding-right: 4px;
+  overflow-y: auto;
+}
+
+.run-log-item {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+}
+
+.run-log-item.error {
+  border-color: #FECACA;
+  background: #FFF7F7;
+}
+
+.run-log-item.success {
+  border-color: #BBF7D0;
+  background: #F7FEF9;
+}
+
+.run-log-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.run-log-head strong {
+  color: var(--text-main);
+  overflow-wrap: anywhere;
+}
+
+.run-log-head span,
+.run-log-item small {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-log-item p {
+  margin: 3px 0;
+  max-width: none;
+  color: var(--text-main);
+  font-size: 11px;
+}
+
+.run-log-item .run-log-message {
+  color: #991B1B;
+  font-weight: 600;
+}
+
+.run-log-item .run-log-hint {
+  color: #7F1D1D;
+}
+
+.run-log-item code {
+  font-size: 10px;
+  user-select: all;
+}
+
+.copy-log-btn {
+  justify-self: start;
+  min-height: 36px;
 }
 
 .footer-actions {
@@ -1443,6 +1579,17 @@ legend {
     display: grid;
     grid-template-columns: 1fr;
     width: 100%;
+  }
+  .upload-limit-notice {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .upload-limit-notice a {
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    white-space: normal;
   }
   .source-actions button,
   .list-actions button,

@@ -56,8 +56,7 @@ jobs:
           if (-not $installer) { throw "NSIS installer was not created" }
           Copy-Item $installer.FullName $env:RELEASE_ASSET
           $hash = (Get-FileHash $env:RELEASE_ASSET -Algorithm SHA256).Hash.ToLowerInvariant()
-          $checksum = "$hash  $env:RELEASE_ASSET`n"
-          [System.IO.File]::WriteAllText("$env:RELEASE_ASSET.sha256", $checksum, [System.Text.ASCIIEncoding]::new($false))
+          "$hash  $env:RELEASE_ASSET" | Set-Content "$env:RELEASE_ASSET.sha256" -NoNewline -Encoding ascii
 
       - name: Publish desktop release
         shell: pwsh

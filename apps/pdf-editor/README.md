@@ -9,3 +9,13 @@ Frontend сохраняет рабочие сценарии исходного T
 ## Лицензия
 
 Этот модуль, включая web-адаптацию и PDF-движок, распространяется по GNU Affero General Public License v3.0 or later. PyMuPDF используется по GNU AGPL; условия остальных частей Locia этим не изменяются.
+
+## Самостоятельный запуск
+
+Нужен Docker Compose. Из корня репозитория:
+
+```sh
+docker compose up --build -d
+```
+
+Откройте `http://localhost:8080/pdf-editor/`. Это поднимет полный демонстрационный набор инструментов. Frontend находится в `src/`, HTTP API — в `server/`, операции над PDF — в `engine/`. Подробности конфигурации и рабочего контура — в [SELF_HOSTING.md](../../docs/SELF_HOSTING.md).

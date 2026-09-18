@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
   "fetchedAt": "2026-08-11T12:56:34Z",
-  "transport": "ssh:zt-box",
   "source": {
     "portalUrl": "https://fgiscs.minstroyrf.ru/frsn/pir/methods",
     "newsUrl": "https://gge.ru/press-center/news/vse-piry-vo-fgis-tss/",

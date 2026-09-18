@@ -242,7 +242,7 @@ export class CadBimViewer {
     container.append(viewport);
 
     world.renderer = new OBC.SimpleRenderer(components, viewport);
-    // Скрываем водяной знак ThatOpen (брендинг библиотеки) — у нас своя обводка «Лоция Атлас».
+    // Product identity is provided by the viewer header.
     (world.renderer as unknown as { showLogo?: boolean }).showLogo = false;
     (world.renderer.three as THREE.WebGLRenderer).localClippingEnabled = true;
     world.camera = new OBC.OrthoPerspectiveCamera(components);

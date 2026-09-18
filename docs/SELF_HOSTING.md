@@ -19,7 +19,7 @@
 ```bash
 git clone https://github.com/proovcme/locia.git
 cd locia
-./scripts/init-work.sh admin@company.ru
+./scripts/init-work.sh admin@example.org
 docker compose --env-file .env.work -f compose.work.yml up --build -d
 ```
 
@@ -39,8 +39,8 @@ curl -I http://localhost:8080/login
 Укажите в `.env.work`:
 
 ```dotenv
-APP_URL=https://locia.company.ru
-LOCIA_WORK_SITE=locia.company.ru
+APP_URL=https://locia.example.org
+LOCIA_WORK_SITE=locia.example.org
 LOCIA_WORK_HTTP_PORT=80
 LOCIA_WORK_HTTPS_PORT=443
 ```

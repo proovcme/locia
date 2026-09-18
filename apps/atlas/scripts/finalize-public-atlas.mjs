@@ -79,8 +79,6 @@ const content = (
   await Promise.all(textFiles.map((file) => readFile(join(dist, file), "utf8")))
 ).join("\n");
 for (const marker of [
-  "000_4",
-  "Дом Радио",
   "ЛОЦИЯ АТЛАС",
   "Лоция Атлас",
   "/tasks/new",

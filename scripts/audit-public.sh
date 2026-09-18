@@ -28,10 +28,10 @@ fi
 
 test "$(find apps/lemma/database/migrations -type f -name '*.sql' | wc -l | tr -d ' ')" -eq 97
 
-if grep -RInE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude='audit-public.sh' \
+if grep -RInE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist \
   --exclude='COPYING' --exclude='*.mjs' \
   --exclude='*.wasm' --exclude='*.png' --exclude='*.svg' --exclude='*.ifc' \
-  '(/Users/|C:\\Users\\|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|Чернетченко|Дом Радио|000_4|1835/2022)' .; then
+  '(/Users/[A-Za-z0-9._-]+/|C:\\Users\\[A-Za-z0-9._-]+|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY)' .; then
   echo "Private marker found" >&2
   exit 1
 fi

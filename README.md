@@ -23,7 +23,9 @@
 - роли, подразделения, отчёты и управленческие представления;
 - связь проектной работы с информационными моделями и расчётами.
 
-[Открыть демо «Леммы»](https://locia.work/lemma/)
+[Открыть демо «Леммы»](https://locia.work/lemma/) · [Самостоятельная Лемма на GitHub](https://github.com/proovcme/lemma)
+
+Актуальная самостоятельная поставка Леммы развивается в `proovcme/lemma`. Этот репозиторий сохраняет общую витрину и прежнюю комплексную сборку.
 
 ![Лемма — управление проектами в проектировании](assets/lemma.png)
 
@@ -138,3 +140,9 @@ scripts/          аудит, настройка и резервное копи�
 ## Лицензии
 
 Внутреннее использование и изменение Locia в собственной организации разрешены условиями [LICENSE.md](LICENSE.md). PDF-редактор выделен в самостоятельный компонент под [GNU AGPL v3 или более поздней версией](apps/pdf-editor/COPYING), поскольку использует PyMuPDF. Модели buildingSMART распространяются по CC BY 4.0; атрибуция приведена в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## ИИ для проектирования
+
+- [Renga MCP](https://github.com/proovcme/rnpmcp) — неофициальное подключение ИИ к открытой модели Renga через MCP.
+- [RU AEC Skills](https://github.com/proovcme/ru-aec-skills) — 44 набора рабочих инструкций для ИИ-агентов в российском проектировании.
+- [bimwright](https://github.com/bimwright/) — MCP-инструменты для Revit, AutoCAD, Navisworks и Inventor.

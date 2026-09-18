@@ -1,0 +1,24 @@
+{
+  "name": "les-cad-bim-viewer",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/fetch-public-atlas-models.mjs && tsc && vite build --config vite.public-atlas.config.ts && node scripts/finalize-public-atlas.mjs",
+    "preview": "vite preview --config vite.public-atlas.config.ts --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@thatopen/components": "~3.4.0",
+    "@thatopen/components-front": "~3.4.0",
+    "@thatopen/fragments": "~3.4.0",
+    "@thatopen/ui": "~3.4.0",
+    "@thatopen/ui-obc": "~3.4.0",
+    "three": "0.184.0",
+    "web-ifc": "0.0.77"
+  },
+  "devDependencies": {
+    "@types/three": "0.184.1",
+    "typescript": "5.2.2",
+    "vite": "^7.1.5"
+  }
+}

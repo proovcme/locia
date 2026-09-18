@@ -1,0 +1,40 @@
+{
+  "name": "project-estimate-calculator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --config vite.public.config.ts --host 127.0.0.1",
+    "build": "tsc && vite build --config vite.public.config.ts && node scripts/finalize_public_pir_build.mjs && node scripts/check_public_pir_bundle.mjs",
+    "preview": "vite preview --config vite.public.config.ts --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.6.0",
+    "@tauri-apps/plugin-dialog": "^2.3.0",
+    "@tauri-apps/plugin-fs": "^2.4.0",
+    "@tauri-apps/plugin-sql": "^2.3.0",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
+    "idb": "^8.0.2",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.6.2",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@types/file-saver": "^2.0.7",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}

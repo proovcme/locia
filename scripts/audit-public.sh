@@ -16,7 +16,7 @@ test -f apps/pdf-editor/COPYING
 test -f apps/pdf-editor/engine/rule_engine.py
 test -f apps/pdf-editor/server/app.py
 
-if find . -type f \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.sqlite' -o -name '*.zip' \) | grep -q .; then
+if find . -type d \( -name .git -o -name node_modules \) -prune -o -type f \( -name '.env' -o -name '*.pem' -o -name '*.key' -o -name '*.p12' -o -name '*.sqlite' -o -name '*.zip' \) -print | grep -q .; then
   echo "Forbidden secret or data artifact found" >&2
   exit 1
 fi

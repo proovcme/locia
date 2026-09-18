@@ -12,11 +12,13 @@
     "atlas": {
       "type": "static-public-build",
       "source_commit": "6095d70",
-      "ifc_models": 23
+      "ifc_models": 23,
+      "source_path": "apps/atlas"
     },
     "calculator": {
       "type": "static-public-build",
-      "source_commit": "0ad2b19"
+      "source_commit": "0ad2b19",
+      "source_path": "apps/pircalc"
     }
   },
   "third_party": {

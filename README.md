@@ -114,7 +114,7 @@ docker compose up --build -d
 Рабочий контур использует постоянную MariaDB, обычный вход по паролю и автоматические миграции.
 
 ```bash
-./scripts/init-work.sh admin@company.ru
+./scripts/init-work.sh admin@example.org
 docker compose --env-file .env.work -f compose.work.yml up --build -d
 ./scripts/backup-work.sh
 ```

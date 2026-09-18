@@ -14,6 +14,10 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
+      - name: Audit publication metadata
+        env:
+          PUBLIC_DENY_TERMS: ${{ secrets.PUBLIC_DENY_TERMS }}
+        run: python3 scripts/audit-metadata.py
       - name: Audit public tree
         run: ./scripts/audit-public.sh
       - name: Test PDF editor frontend

@@ -39,7 +39,6 @@ export interface FgisPirPeriod {
 export interface FgisPirSnapshot {
   schemaVersion: number;
   fetchedAt: string;
-  transport: string;
   source: {
     portalUrl: string;
     newsUrl: string;

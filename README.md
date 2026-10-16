@@ -145,6 +145,7 @@ scripts/          аудит, настройка и резервное копи�
 
 ## ИИ для проектирования
 
+- [Увязка](https://github.com/proovcme/uvyazka) — инструменты и память строительного проекта для ИИ-клиентов. [3D-демо графика](https://locia.work/uvyazka/) · [Сборка](apps/uvyazka-demo/).
 - [Renga MCP](https://github.com/proovcme/rnpmcp) — неофициальное подключение ИИ к открытой модели Renga через MCP.
 - [RU AEC Skills](https://github.com/proovcme/ru-aec-skills) — 44 набора рабочих инструкций для ИИ-агентов в российском проектировании.
 - [bimwright](https://github.com/bimwright/) — MCP-инструменты для Revit, AutoCAD, Navisworks и Inventor.
